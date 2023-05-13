@@ -12,7 +12,7 @@ public class weaponDispContrller : MonoBehaviour
     void Start()
     {
         mode = microCanvas.GetComponent<microController>().weaponMode;
-        Debug.Log(mode);
+     
     }
 
     // Update is called once per frame

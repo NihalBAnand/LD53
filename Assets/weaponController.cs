@@ -21,7 +21,7 @@ public class weaponController : MonoBehaviour
     public void strongestFirst()
     {
         microCanvas.GetComponent<microController>().weaponMode = 0;
-        Debug.Log("I AM PRESSED");
+        
 
     }
     public void fastestFirst()
