@@ -26,12 +26,17 @@ public class microController : MonoBehaviour
     public List<GameObject> cargo;
     int spaceAvail;
 
+    //Weapons
+    public int weaponMode = 3;//0=StrongestFirst, 1= fastestFirst, 2 = LargestFirst, else = off
+  
+  
+
 
     void Start()
     {
         spaceAvail = cargoArea;
         cargo = new List<GameObject>();
-       
+               
     }
 
     // Update is called once per frame
@@ -43,18 +48,14 @@ public class microController : MonoBehaviour
 
     public void addCargo(int space, int value)
     {
-        /*
-        for(int i = 0; i<cargo.Count; i++)
-        {
-            spaceAvail -= cargo[i].GetComponent<payLoadController>().space;
-            
-        }*/
-        
+       
         if (spaceAvail >= space)
         {
+            //create the cargo
             cargo.Add(Instantiate(payLoad, new Vector3(0, 0, 0), Quaternion.identity));
             cargo[cargo.Count - 1].GetComponent<payLoadController>().space = space;
             cargo[cargo.Count - 1].GetComponent<payLoadController>().value = value;
+
             spaceAvail -= space;
         }
         else
