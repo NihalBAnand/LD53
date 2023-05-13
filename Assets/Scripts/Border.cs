@@ -28,10 +28,17 @@ public class Border : MonoBehaviour
                 break;
         }
         GetComponent<Image>().color = color;
+
+        UpdateBorder();
     }
 
     // Update is called once per frame
     void Update()
+    {
+        
+    }
+
+    public void UpdateBorder()
     {
         float furthestLeft = 999999;
         float furthestRight = -9999999999;

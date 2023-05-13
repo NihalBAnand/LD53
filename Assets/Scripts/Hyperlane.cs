@@ -23,7 +23,6 @@ public class Hyperlane : MonoBehaviour
         {
             color = new Color32(255, 255, 255, 255);
         }
-        Debug.Log(selected);
     }
 
     // Start is called before the first frame update

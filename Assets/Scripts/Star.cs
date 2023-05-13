@@ -1,17 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class Star : MonoBehaviour
+    , IPointerClickHandler
 {
     public List<GameObject> connectedStars;
     public GameObject hyperlane;
 
     public string nationality;
     public GameObject border;
+
+    Color color;
+    bool selected;
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        selected = !selected;
+        if (selected)
+        {
+            color = new Color32(204, 135, 8, 255);
+            Debug.Log(color);
+        }
+        else
+        {
+            color = new Color32(255, 255, 255, 255);
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+        color = new Color32(255, 255, 255, 255);
+        selected = false;
+
         //create hyperlane
         foreach (GameObject star in connectedStars)
         {
@@ -41,19 +65,27 @@ public class Star : MonoBehaviour
             newHyperlane.transform.SetParent(GameObject.Find("MacroCanvas").transform);
             newHyperlane.transform.SetAsFirstSibling();
         }
-
-        if (GameObject.Find(nationality + "Border") == null)
+        GameObject findBorder = GameObject.Find(nationality + "Border");
+        if (findBorder == null)
         {
             GameObject newBorder = Instantiate(border);
             newBorder.transform.SetParent(GameObject.Find("MacroCanvas").transform);
             newBorder.name = nationality + "Border";
             newBorder.GetComponent<Border>().nationality = nationality;
+            newBorder.GetComponent<Border>().UpdateBorder();
         }
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        GetComponent<Image>().color = color;
+
+        if (selected && Input.GetMouseButtonDown(0))
+        {
+            selected = false;
+            color = new Color32(255, 255, 255, 255);
+        }
     }
 }
