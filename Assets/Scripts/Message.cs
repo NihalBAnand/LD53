@@ -84,7 +84,7 @@ public class Message : MonoBehaviour
 
             if (weaponsPickup)
             {
-                GameObject.Find("MicroCanvas").GetComponent<microController>().addCargo(weaponsCargoSpace, weaponsValue);
+                GameObject.Find("MicroCanvas").GetComponent<microController>().addCargo(weaponsCargoSpace, weaponsValue, 10000);
 
                 weaponsCustomerSystem.GetComponent<Star>().message = Instantiate(weaponsCustomerSystem.GetComponent<Star>().msgPrefab);
 
@@ -105,7 +105,8 @@ public class Message : MonoBehaviour
 
             if (weaponsDropoff)
             {
-                GameObject.Find("MicroCanvas").GetComponent<microController>().removeCargo(weaponsCargoSpace, weaponsValue);
+                
+                GameObject.Find("MicroCanvas").GetComponent<microController>().removeCargo(weaponsCargoSpace, weaponsValue, true);
 
                 Destroy(GameObject.Find("DL_" + weaponsDealerSystem.name + "-" + weaponsCustomerSystem.name));
             }

@@ -34,7 +34,7 @@ public class microController : MonoBehaviour
     public int weaponMode = 3;//0=StrongestFirst, 1= fastestFirst, 2 = LargestFirst, else = off
 
     //Money
-    public int moneyValue = 0;
+    public int moneyValue = 0;//call roi for finished jobs
 
     //Rations
     public double rationPercent = 100;
@@ -64,7 +64,7 @@ public class microController : MonoBehaviour
     }
 
 
-    public void addCargo(int space, int value)
+    public void addCargo(int space, int initvalue, int time)
     {
        
         if (spaceAvail >= space)
@@ -72,8 +72,8 @@ public class microController : MonoBehaviour
             //create the cargo
             cargo.Add(Instantiate(payLoad, new Vector3(0, 0, 0), Quaternion.identity));
             cargo[cargo.Count - 1].GetComponent<payLoadController>().space = space;
-            cargo[cargo.Count - 1].GetComponent<payLoadController>().value = value;
-
+            cargo[cargo.Count - 1].GetComponent<payLoadController>().initvalue = initvalue;
+            cargo[cargo.Count - 1].GetComponent<payLoadController>().time = time;
             spaceAvail -= space;
         }
         else
@@ -94,11 +94,15 @@ public class microController : MonoBehaviour
         }
     }*/
 
-    public void removeCargo(int space, int value)
+    public void removeCargo(int space, int value, bool complete)
     {
         foreach (GameObject cargoItem in cargo)
         {
-            if (cargoItem.GetComponent<payLoadController>().space == space && cargoItem.GetComponent<payLoadController>().value == value)
+            if (complete)
+            {
+                moneyValue += cargoItem.GetComponent<payLoadController>().roi();
+            }
+            if (cargoItem.GetComponent<payLoadController>().space == space && cargoItem.GetComponent<payLoadController>().initvalue == value)
             {
                 cargo.Remove(cargoItem);
                 Destroy(cargoItem);
