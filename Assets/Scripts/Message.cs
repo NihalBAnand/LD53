@@ -6,6 +6,7 @@ using UnityEngine;
 public class Message : MonoBehaviour
 {
     public bool isChoice;
+    public bool isPersistent;
 
     public GameObject weaponsDealerSystem;
     public GameObject weaponsCustomerSystem;
@@ -22,13 +23,23 @@ public class Message : MonoBehaviour
     public string hyperlaneInfo;
 
     public bool isRead;
+
+    public GameObject messages;
+    public GameObject showMessages;
     // Start is called before the first frame update
     void Start()
     {
+        showMessages = GameObject.Find("ShowMessages");
+        messages = GameObject.Find("Messages");
         //if this is a choice, show deny button; if this is just info, hide deny button
         if (isChoice)
         {
             transform.Find("Deny").gameObject.SetActive(true);
+        }
+        else if (isPersistent)
+        {
+            transform.Find("Accept").gameObject.SetActive(false);
+            transform.Find("Deny").gameObject.SetActive(false);
         }
         else
         {
@@ -50,6 +61,16 @@ public class Message : MonoBehaviour
         if (isChoice)
         {
             weaponsDealerSystem.GetComponent<Star>().message.GetComponent<Message>().weaponsPickupActive = true;
+
+            GameObject newMessage = Instantiate(gameObject);
+            newMessage.GetComponent<Message>().isPersistent = true;
+            newMessage.GetComponent<Message>().isChoice = false;
+            newMessage.transform.SetParent(messages.transform.Find("Viewport").Find("Content"));
+
+            newMessage.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text = "ACTIVE: Cargo delivery from " + weaponsDealerSystem.name + " to " + weaponsCustomerSystem.name;
+
+            newMessage.name = "DL_" + weaponsDealerSystem.name + "-" + weaponsCustomerSystem.name;
+
             //TODO: implement accepting a quest
             Destroy(gameObject);
         }
@@ -73,6 +94,7 @@ public class Message : MonoBehaviour
                 weaponsCustomerSystem.GetComponent<Star>().message.GetComponent<Message>().weaponsPickupActive = false;
 
                 weaponsCustomerSystem.GetComponent<Star>().message.GetComponent<Message>().weaponsDealerSystem = weaponsDealerSystem;
+                weaponsCustomerSystem.GetComponent<Star>().message.GetComponent<Message>().weaponsCustomerSystem = weaponsCustomerSystem;
 
                 weaponsCustomerSystem.GetComponent<Star>().message.GetComponent<Message>().weaponsCargoSpace = weaponsCargoSpace;
                 weaponsCustomerSystem.GetComponent<Star>().message.GetComponent<Message>().weaponsValue = weaponsValue;
@@ -84,6 +106,8 @@ public class Message : MonoBehaviour
             if (weaponsDropoff)
             {
                 GameObject.Find("MicroCanvas").GetComponent<microController>().removeCargo(weaponsCargoSpace, weaponsValue);
+
+                Destroy(GameObject.Find("DL_" + weaponsDealerSystem.name + "-" + weaponsCustomerSystem.name));
             }
             //destroy this message to not clog up space
             Destroy(gameObject);

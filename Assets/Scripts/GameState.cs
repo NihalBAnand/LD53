@@ -126,43 +126,86 @@ public class GameState : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(Random.Range(minTimeBetweenJobs, maxTimeBetweenJobs));
-            if (!generatedJob)
+
+            bool failed = false;
+
+            //determine space and value of cargo
+            int cargoSpace = Random.Range(10, 50);
+            int value = Random.Range(500, 2000);
+
+            //determine customer system
+            GameObject messageStar = GameObject.FindGameObjectsWithTag("Star")[Random.Range(0, GameObject.FindGameObjectsWithTag("Star").Length)];
+            int maxTries = GameObject.FindGameObjectsWithTag("Star").Length;
+            int tries = 0;
+            while (messageStar.GetComponent<Star>().message != null && tries <= maxTries)
             {
-                generatedJob = true;
+                messageStar = GameObject.FindGameObjectsWithTag("Star")[Random.Range(0, GameObject.FindGameObjectsWithTag("Star").Length)];
+                tries++;
+                if (tries > maxTries)
+                {
+                    failed = true;
+                }
+            }
+            
 
-                //determine space and value of cargo
-                int cargoSpace = Random.Range(10, 50);
-                int value = Random.Range(500, 2000);
+            //instantiate message
+            messageStar.GetComponent<Star>().message = Instantiate(messageStar.GetComponent<Star>().msgPrefab);
 
-                GameObject messageStar = GameObject.FindGameObjectsWithTag("Star")[Random.Range(0, GameObject.FindGameObjectsWithTag("Star").Length)];
+            //set to "job" type message
+            messageStar.GetComponent<Star>().message.GetComponent<Message>().isChoice = true;
+            messageStar.GetComponent<Star>().message.GetComponent<Message>().weaponsCustomerSystem = messageStar;
+                
+            //find a random dealer that is not the customer
+            GameObject dealer = messageStar;
 
-                messageStar.GetComponent<Star>().message = Instantiate(messageStar.GetComponent<Star>().msgPrefab);
+            maxTries = GameObject.FindGameObjectsWithTag("Star").Length;
+            tries = 0;
+            while ((dealer == messageStar || dealer.GetComponent<Star>().message != null) && tries <= maxTries)
+            {
+                dealer = GameObject.FindGameObjectsWithTag("Star")[Random.Range(0, GameObject.FindGameObjectsWithTag("Star").Length)];
+                tries++;
+                if (tries > maxTries)
+                {
+                    failed = true;
+                }
+            }
 
-                messageStar.GetComponent<Star>().message.GetComponent<Message>().isChoice = true;
-                messageStar.GetComponent<Star>().message.GetComponent<Message>().weaponsCustomerSystem = messageStar;
-                GameObject dealer = messageStar;
-                while (dealer == messageStar)
-                    dealer = GameObject.FindGameObjectsWithTag("Star")[Random.Range(0, GameObject.FindGameObjectsWithTag("Star").Length)];
+            if (!failed)
+            {
                 messageStar.GetComponent<Star>().message.GetComponent<Message>().weaponsDealerSystem = dealer;
+
+                //set text for job
                 messageStar.GetComponent<Star>().message.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text = "Transport cargo from " + dealer.name + " to " + messageStar.name + ". Cargo takes up " + cargoSpace.ToString() + " litres and is worth " + value.ToString();
 
                 messageStar.GetComponent<Star>().message.SetActive(false);
 
+
+                //instantiate message for dealer
                 dealer.GetComponent<Star>().message = Instantiate(dealer.GetComponent<Star>().msgPrefab);
 
+                //set to "weapons pickup" type message
                 dealer.GetComponent<Star>().message.GetComponent<Message>().isChoice = false;
                 dealer.GetComponent<Star>().message.GetComponent<Message>().weaponsPickup = true;
                 dealer.GetComponent<Star>().message.GetComponent<Message>().weaponsPickupActive = false;
 
+                //set customer and dealer systems
                 dealer.GetComponent<Star>().message.GetComponent<Message>().weaponsCustomerSystem = messageStar;
                 dealer.GetComponent<Star>().message.GetComponent<Message>().weaponsDealerSystem = dealer;
 
+                //set cargo value and space
                 dealer.GetComponent<Star>().message.GetComponent<Message>().weaponsCargoSpace = cargoSpace;
                 dealer.GetComponent<Star>().message.GetComponent<Message>().weaponsValue = value;
+
+                //set text for job
                 dealer.GetComponent<Star>().message.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text = "Received cargo bound for " + messageStar.name + ".";
 
                 dealer.GetComponent<Star>().message.SetActive(false);
             }
+            else
+            {
+                Destroy(messageStar.GetComponent<Star>().message);
+            }
         }
+        
     }
 }
