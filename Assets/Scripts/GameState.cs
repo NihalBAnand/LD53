@@ -200,12 +200,29 @@ public class GameState : MonoBehaviour
                 dealer.GetComponent<Star>().message.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text = "Received cargo bound for " + messageStar.name + ".";
 
                 dealer.GetComponent<Star>().message.SetActive(false);
+
+                StartCoroutine(JobAcceptTimer(messageStar.GetComponent<Star>().message));
             }
             else
             {
                 Destroy(messageStar.GetComponent<Star>().message);
+                messageStar.GetComponent<Star>().message = null;
             }
         }
         
+    }
+
+    IEnumerator JobAcceptTimer(GameObject job)
+    {
+        int acceptTime = 10;
+        while (acceptTime >= 0)
+        {
+            yield return new WaitForSeconds(1);
+            acceptTime -= 1;
+        }
+        job.GetComponent<Message>().weaponsCustomerSystem.GetComponent<Star>().message = null;
+        job.GetComponent<Message>().weaponsDealerSystem.GetComponent<Star>().message = null;
+        showMessages.GetComponent<ShowMessages>().unreadMessages.Remove(job);
+        Destroy(job);
     }
 }
