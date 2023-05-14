@@ -11,14 +11,18 @@ public class microController : MonoBehaviour
     //AI controls air qc
     public bool AI = true;
 
+
     //Engine
     public double engineHealth = 1; //fuel efficiency coeficcient 
     public double radiationLevel = 0;
+    public double fuelPercent = 100;
+    public double depletionRate = .1;
+    public double maxSpeed = 1;//(It's a proportional thingy)
 
-    
+    //MISC FOR NOW
     public bool hull = true;//You die if hull is gone
     public double commHealth = 1;//less likely to recieve messages
-    public double morale = 1;//I assume it causes mutiny(death)
+     
 
     //Cargo
     public int cargoArea = 100;
@@ -28,14 +32,27 @@ public class microController : MonoBehaviour
 
     //Weapons
     public int weaponMode = 3;//0=StrongestFirst, 1= fastestFirst, 2 = LargestFirst, else = off
-  
+
+    //Money
+    public int moneyValue = 0;
+
+    //Rations
+    public double rationPercent = 100;
+    public float eatingRateinseconds = 10;//FOR INTERNAL PURPOSES FOR HOW MANY SECONDS DO WE DEPLETE
+    public double rationDepletionRate = .1;  
+
+    //Ship Efficiency
+    public double morale = 1;//I assume it causes mutiny(death)
+    public double stability;
   
 
 
     void Start()
     {
+
         spaceAvail = cargoArea;
         cargo = new List<GameObject>();
+        stability = 1;
                
     }
 
@@ -63,4 +80,17 @@ public class microController : MonoBehaviour
             Debug.Log("NO SPACE");
         }
     }
+    /*
+    IEnumerator breakCheck()
+    {
+        for(; ; )
+        {
+            if (instability<1)
+            {
+                
+            }
+        }
+    }*/
+
+
 }
