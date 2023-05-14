@@ -39,8 +39,8 @@ public class rationController : MonoBehaviour
     public void changeRationMode()
     {
         rationing *=-1;
-        if(rationing < 0) { microCanvas.GetComponent<microController>().morale / .9};
-        else { microCanvas.GetComponent<microController>().morale *= .9 };
+        if(rationing < 0) { microCanvas.GetComponent<microController>().morale /= .9; }
+        else { microCanvas.GetComponent<microController>().morale *= .9; }
     }
 
 }
