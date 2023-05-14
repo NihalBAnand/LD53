@@ -197,7 +197,7 @@ public class Star : MonoBehaviour
         }
 
         //if we have a message and we aren't flashing, start flashing
-        if (message != null && !msgFlashing)
+        if (message != null && !msgFlashing && !message.GetComponent<Message>().weaponsPickup || message != null && !msgFlashing && message.GetComponent<Message>().weaponsPickupActive)
         {
             StartCoroutine(FlashMessage());
         }
@@ -232,5 +232,6 @@ public class Star : MonoBehaviour
             color = new Color32(255, 255, 255, 255);
             yield return new WaitForSeconds(.3f);
         }
+        msgFlashing = false;
     }
 }

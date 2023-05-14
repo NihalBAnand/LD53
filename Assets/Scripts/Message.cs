@@ -6,8 +6,13 @@ public class Message : MonoBehaviour
 {
     public bool isChoice;
 
-    public GameObject weaponsDealer;
-    public GameObject weaponsCustomer;
+    public GameObject weaponsDealerSystem;
+    public GameObject weaponsCustomerSystem;
+
+    public bool weaponsPickup;
+    public bool weaponsPickupActive;
+    public int weaponsCargoSpace;
+    public int weaponsValue;
 
     public GameObject relevantHyperlane;
     public string hyperlaneInfo;
@@ -40,6 +45,7 @@ public class Message : MonoBehaviour
     {
         if (isChoice)
         {
+            weaponsDealerSystem.GetComponent<Star>().message.GetComponent<Message>().weaponsPickupActive = true;
             //TODO: implement accepting a quest
             Destroy(gameObject);
         }
@@ -49,7 +55,11 @@ public class Message : MonoBehaviour
             if (relevantHyperlane != null)
             {
                 relevantHyperlane.GetComponent<Hyperlane>().specialConditionKnown = true;
-                relevantHyperlane.GetComponent<Hyperlane>().specialCondition = hyperlaneInfo;
+            }
+
+            if (weaponsPickup)
+            {
+                GameObject.Find("MicroCanvas").GetComponent<microController>().addCargo(weaponsCargoSpace, weaponsValue);
             }
             //destroy this message to not clog up space
             Destroy(gameObject);
@@ -57,6 +67,10 @@ public class Message : MonoBehaviour
     }
     public void Deny()
     {
+        if (isChoice)
+        {
+            Destroy(weaponsDealerSystem.GetComponent<Star>().message);
+        }
         Destroy(gameObject);
     }
 }
