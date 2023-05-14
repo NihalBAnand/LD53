@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class microController : MonoBehaviour
 {
@@ -18,6 +19,8 @@ public class microController : MonoBehaviour
     public double fuelPercent = 100;
     public double depletionRate = .1;
     public double maxSpeed = 1;//(It's a proportional thingy)
+    public GameObject speedSlider;
+    public double speed;
 
     //MISC FOR NOW
     public bool hull = true;//You die if hull is gone
@@ -68,7 +71,7 @@ public class microController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        speed = speedSlider.GetComponent<Slider>().value;
     }
 
 

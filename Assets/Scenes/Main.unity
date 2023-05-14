@@ -1363,6 +1363,7 @@ MonoBehaviour:
   minTimeBetweenJobs: 5
   maxTimeBetweenJobs: 20
   macroEnabled: 0
+  flying: 0
 --- !u!1 &787321639
 GameObject:
   m_ObjectHideFlags: 0
@@ -3321,6 +3322,8 @@ MonoBehaviour:
   fuelPercent: 100
   depletionRate: 0.1
   maxSpeed: 1
+  speedSlider: {fileID: 1116058298}
+  speed: 0
   hull: 1
   commHealth: 1
   cargoArea: 100

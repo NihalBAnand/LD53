@@ -183,17 +183,20 @@ public class Star : MonoBehaviour
         }
 
         //set color according to status
-        if (GameObject.Find("GameState").GetComponent<GameState>().currentLocation == gameObject) //player is here
+        if (!GameObject.Find("GameState").GetComponent<GameState>().flying)
         {
-            color = new Color32(66, 135, 245, 255);
-        }
-        else if (!selected && !msgFlashing) //we don't have a message here and we aren't selected
-        {
-            color = new Color32(255, 255, 255, 255);
-        }
-        else if (!msgFlashing) //we don't have a message and we are selected
-        {
-            color = new Color32(204, 135, 8, 255);
+            if (GameObject.Find("GameState").GetComponent<GameState>().currentLocation == gameObject) //player is here
+            {
+                color = new Color32(66, 135, 245, 255);
+            }
+            else if (!selected && !msgFlashing) //we don't have a message here and we aren't selected
+            {
+                color = new Color32(255, 255, 255, 255);
+            }
+            else if (!msgFlashing) //we don't have a message and we are selected
+            {
+                color = new Color32(204, 135, 8, 255);
+            }
         }
 
         //if we have a message and we aren't flashing, start flashing
@@ -205,6 +208,24 @@ public class Star : MonoBehaviour
 
     public void TravelHere()
     {
+        StartCoroutine(Travel());
+    }
+
+    IEnumerator Travel()
+    {
+        GameObject.Find("GameState").GetComponent<GameState>().currentLocation = null;
+        GameObject.Find("GameState").GetComponent<GameState>().flying = true;
+
+        int travelTime = 5000;
+        travelTime = (int) ((double)travelTime / GameObject.Find("MicroCanvas").GetComponent<microController>().speed);
+        int maxTT = travelTime;
+        Debug.Log(travelTime);
+        while (travelTime >= 0)
+        {
+            yield return new WaitForSeconds(0.001f);
+            travelTime--;
+            color = Color.Lerp(new Color32(66, 135, 245, 255), new Color32(255, 255, 255, 255), travelTime / (float)maxTT);
+        }
         //set player location to here
         GameObject.Find("GameState").GetComponent<GameState>().currentLocation = gameObject;
 
@@ -219,6 +240,8 @@ public class Star : MonoBehaviour
             hplane.GetComponent<Hyperlane>().selected = false;
             hplane.transform.Find("InfoBox").gameObject.SetActive(false);
         }
+
+        GameObject.Find("GameState").GetComponent<GameState>().flying = false;
     }
 
     IEnumerator FlashMessage()

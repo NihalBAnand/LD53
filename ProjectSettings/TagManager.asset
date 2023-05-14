@@ -8,6 +8,7 @@ TagManager:
   - Star
   - Message
   - Hyperlane
+  - InfoBox
   layers:
   - Default
   - TransparentFX

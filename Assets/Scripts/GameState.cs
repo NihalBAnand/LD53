@@ -20,13 +20,14 @@ public class GameState : MonoBehaviour
     public bool macroEnabled;
 
     bool initedMessages;
-    bool generatedJob;
+    
+    public bool flying;
     // Start is called before the first frame update
     void Start()
     {
         macroEnabled = false;
         initedMessages = false;
-        generatedJob = false;
+        flying = false;
     }
 
     // Update is called once per frame
@@ -43,7 +44,7 @@ public class GameState : MonoBehaviour
             StartCoroutine(GenerateJobs());
         }
 
-        if (currentLocation.GetComponent<Star>().message != null)
+        if (currentLocation != null && currentLocation.GetComponent<Star>().message != null)
         {
             if (!currentLocation.GetComponent<Star>().message.GetComponent<Message>().weaponsPickup || currentLocation.GetComponent<Star>().message.GetComponent<Message>().weaponsPickupActive)
             {
@@ -60,11 +61,19 @@ public class GameState : MonoBehaviour
         {
             GameObject.Find("MacroCanvas").GetComponent<Canvas>().enabled = true;
             GameObject.Find("MicroCanvas").GetComponent<Canvas>().enabled = false;
+            foreach (GameObject box in GameObject.FindGameObjectsWithTag("InfoBox"))
+            {
+                box.GetComponent<Canvas>().enabled = true;
+            }
         }
         else
         {
             GameObject.Find("MacroCanvas").GetComponent<Canvas>().enabled = false;
             GameObject.Find("MicroCanvas").GetComponent<Canvas>().enabled = true;
+            foreach (GameObject box in GameObject.FindGameObjectsWithTag("InfoBox"))
+            {
+                box.GetComponent<Canvas>().enabled = false;
+            }
         }
     }
 

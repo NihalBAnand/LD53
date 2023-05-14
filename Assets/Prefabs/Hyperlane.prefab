@@ -90,10 +90,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e87d845742136a746ab7495ec4f15eb3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  color: {r: 0, g: 0, b: 0, a: 0}
+  selected: 0
   connectedStars:
   - {fileID: 0}
   - {fileID: 0}
   specialCondition: 
+  specialConditionKnown: 0
 --- !u!1 &2837578272204078777
 GameObject:
   m_ObjectHideFlags: 0
@@ -243,7 +246,7 @@ GameObject:
   - component: {fileID: 3262175881737624537}
   m_Layer: 5
   m_Name: InfoBox
-  m_TagString: Untagged
+  m_TagString: InfoBox
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

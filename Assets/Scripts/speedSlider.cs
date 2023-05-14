@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class speedSlider : MonoBehaviour
 {
@@ -16,6 +17,15 @@ public class speedSlider : MonoBehaviour
     void Update()
     {
         maxSpeed = microCanvas.GetComponent<microController>().maxSpeed;
+
+        if (GameObject.Find("GameState").GetComponent<GameState>().flying)
+        {
+            GetComponent<Slider>().enabled = false;
+        }
+        else
+        {
+            GetComponent<Slider>().enabled = true;
+        }
     }
    
 }
