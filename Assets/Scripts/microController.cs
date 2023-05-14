@@ -39,7 +39,8 @@ public class microController : MonoBehaviour
     //Rations
     public double rationPercent = 100;
     public float eatingRateinseconds = 10;//FOR INTERNAL PURPOSES FOR HOW MANY SECONDS DO WE DEPLETE
-    public double rationDepletionRate = .1;  
+    public double rationDepletionRate = .1;
+    public double rationSlowDepletionRate = .05;
 
     //Ship Efficiency
     public double morale = 1;//I assume it causes mutiny(death)
