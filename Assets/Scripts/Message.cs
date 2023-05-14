@@ -9,12 +9,14 @@ public class Message : MonoBehaviour
     public GameObject weaponsDealer;
     public GameObject weaponsCustomer;
 
-    public GameObject showMessages;
+    public GameObject relevantHyperlane;
+    public string hyperlaneInfo;
 
     public bool isRead;
     // Start is called before the first frame update
     void Start()
     {
+        //if this is a choice, show deny button; if this is just info, hide deny button
         if (isChoice)
         {
             transform.Find("Deny").gameObject.SetActive(true);
@@ -23,17 +25,11 @@ public class Message : MonoBehaviour
         {
             transform.Find("Deny").gameObject.SetActive(false);
         }
-
+        //set scale to identity - for some reason, it showed up at a smaller scale for no reason when instantiated
         transform.localScale = new Vector3(1, 1, 1);
     }
 
-    private void OnEnable()
-    {
-        if (!isRead)
-        {
-            isRead = true;
-        }
-    }
+    
     // Update is called once per frame
     void Update()
     {
@@ -49,6 +45,13 @@ public class Message : MonoBehaviour
         }
         else
         {
+            //if the info is about a hyperlane, show that info on that hyperlane's info box
+            if (relevantHyperlane != null)
+            {
+                relevantHyperlane.GetComponent<Hyperlane>().specialConditionKnown = true;
+                relevantHyperlane.GetComponent<Hyperlane>().specialCondition = hyperlaneInfo;
+            }
+            //destroy this message to not clog up space
             Destroy(gameObject);
         }
     }
