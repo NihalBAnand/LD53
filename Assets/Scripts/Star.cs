@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -8,33 +10,100 @@ public class Star : MonoBehaviour
     , IPointerClickHandler
 {
     public List<GameObject> connectedStars;
+    public HashSet<GameObject> realConnectedStars;
     public GameObject hyperlane;
 
     public string nationality;
     public GameObject border;
 
-    Color color;
+    public Color color;
     bool selected;
+
+    public GameObject msgPrefab;
+    public GameObject message;
+    bool msgFlashing;
+
+    bool initedHyperlaneConns;
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        //toggle selection on click
         selected = !selected;
+
         if (selected)
         {
-            color = new Color32(204, 135, 8, 255);
-            Debug.Log(color);
+            //activate info box
+            Transform infoBox = transform.Find("InfoBox");
+            infoBox.gameObject.SetActive(true);
+
+            ///write text to textbox
+            //write star name to textbox
+            infoBox.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text = "System name: " + name;
+
+            //write connections to textbox
+            infoBox.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text += "\nConnections:\n";
+            GameObject[] hyperlanes = GameObject.FindGameObjectsWithTag("Hyperlane");
+            for (int i = 0; i < hyperlanes.Length; i++)
+            {
+                if (Array.IndexOf(hyperlanes[i].GetComponent<Hyperlane>().connectedStars, gameObject) != -1)
+                {
+                    foreach (GameObject star in hyperlanes[i].GetComponent<Hyperlane>().connectedStars)
+                    {
+                        if (star != gameObject)
+                        {
+                            infoBox.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text += star.name + " ";
+                            //add any found connections to the functional connections hashset
+                            realConnectedStars.Add(star);
+                        }
+                    }
+                }
+            }
+            //write nationality to textbox
+            infoBox.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text += "\nNationality:\n" + nationality;
+
+            //write YOU ARE HERE if you're here
+            if (GameObject.Find("GameState").GetComponent<GameState>().currentLocation == gameObject)
+            {
+                infoBox.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text += "\n<b>You are here.</b>";
+            }
+
+            //write that there's a message if we have one
+            if (message != null)
+            {
+                infoBox.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text += "\nA message is available!";
+            }
+
+            //if we border the star where the player is, enable "travel here" button
+            if (realConnectedStars.Contains(GameObject.Find("GameState").GetComponent<GameState>().currentLocation))
+            {
+                infoBox.gameObject.GetComponent<StarInfoBox>().travelButton.GetComponent<Button>().interactable = true;
+                infoBox.gameObject.GetComponent<StarInfoBox>().travelButton.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().color = new Color32(0, 0, 0, 255);
+            }
+            //otherwise, disable it
+            else
+            {
+                infoBox.gameObject.GetComponent<StarInfoBox>().travelButton.GetComponent<Button>().interactable = false;
+                infoBox.gameObject.GetComponent<StarInfoBox>().travelButton.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().color = new Color32(0, 0, 0, 0);
+            }
         }
         else
         {
-            color = new Color32(255, 255, 255, 255);
+            //disable infobox if we're deslecting
+            Transform infoBox = transform.Find("InfoBox");
+            infoBox.gameObject.SetActive(false);
         }
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        color = new Color32(255, 255, 255, 255);
+        msgFlashing = false;
+
         selected = false;
+
+        initedHyperlaneConns = false;
+
+        realConnectedStars = new HashSet<GameObject>();
 
         //create hyperlane
         foreach (GameObject star in connectedStars)
@@ -60,32 +129,109 @@ public class Star : MonoBehaviour
             //set connection in code
             newHyperlane.GetComponent<Hyperlane>().connectedStars[0] = gameObject;
             newHyperlane.GetComponent<Hyperlane>().connectedStars[1] = star;
+            newHyperlane.name = "HL_" + gameObject.name + "-" + star.name;
 
             //detach hyperlane from host for rendering reasons
-            newHyperlane.transform.SetParent(GameObject.Find("MacroCanvas").transform);
+            newHyperlane.transform.SetParent(GameObject.Find("ScaledUI").transform);
             newHyperlane.transform.SetAsFirstSibling();
         }
+
+        //see if we have a border for our nation, and if not, make one
         GameObject findBorder = GameObject.Find(nationality + "Border");
         if (findBorder == null)
         {
             GameObject newBorder = Instantiate(border);
-            newBorder.transform.SetParent(GameObject.Find("MacroCanvas").transform);
+            newBorder.transform.SetParent(GameObject.Find("ScaledUI").transform);
             newBorder.name = nationality + "Border";
             newBorder.GetComponent<Border>().nationality = nationality;
             newBorder.GetComponent<Border>().UpdateBorder();
         }
+
+
         
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!initedHyperlaneConns)
+        {
+            initedHyperlaneConns = true;
+            GameObject[] hyperlanes = GameObject.FindGameObjectsWithTag("Hyperlane");
+            for (int i = 0; i < hyperlanes.Length; i++)
+            {
+                if (Array.IndexOf(hyperlanes[i].GetComponent<Hyperlane>().connectedStars, gameObject) != -1)
+                {
+                    foreach (GameObject star in hyperlanes[i].GetComponent<Hyperlane>().connectedStars)
+                    {
+                        if (star != gameObject)
+                        {
+                            //add any found connections to the functional connections hashset
+                            realConnectedStars.Add(star);
+                        }
+                    }
+                }
+            }
+        }
         GetComponent<Image>().color = color;
 
-        if (selected && Input.GetMouseButtonDown(0))
+        //clear selection on right click
+        if (Input.GetMouseButtonDown(1))
         {
             selected = false;
+            transform.Find("InfoBox").gameObject.SetActive(false);
+        }
+
+        //set color according to status
+        if (GameObject.Find("GameState").GetComponent<GameState>().currentLocation == gameObject) //player is here
+        {
+            color = new Color32(66, 135, 245, 255);
+        }
+        else if (!selected && !msgFlashing) //we don't have a message here and we aren't selected
+        {
             color = new Color32(255, 255, 255, 255);
         }
+        else if (!msgFlashing) //we don't have a message and we are selected
+        {
+            color = new Color32(204, 135, 8, 255);
+        }
+
+        //if we have a message and we aren't flashing, start flashing
+        if (message != null && !msgFlashing && !message.GetComponent<Message>().weaponsPickup || message != null && !msgFlashing && message.GetComponent<Message>().weaponsPickupActive)
+        {
+            StartCoroutine(FlashMessage());
+        }
+    }
+
+    public void TravelHere()
+    {
+        //set player location to here
+        GameObject.Find("GameState").GetComponent<GameState>().currentLocation = gameObject;
+
+        //deselect everything
+        foreach (GameObject star in GameObject.FindGameObjectsWithTag("Star"))
+        {
+            star.GetComponent<Star>().selected = false;
+            star.transform.Find("InfoBox").gameObject.SetActive(false);
+        }
+        foreach (GameObject hplane in GameObject.FindGameObjectsWithTag("Hyperlane"))
+        {
+            hplane.GetComponent<Hyperlane>().selected = false;
+            hplane.transform.Find("InfoBox").gameObject.SetActive(false);
+        }
+    }
+
+    IEnumerator FlashMessage()
+    {
+        //flash red, then white
+        msgFlashing = true;
+        while (message != null)
+        {
+            color = new Color32(255, 0, 0, 255);
+            yield return new WaitForSeconds(.3f);
+            color = new Color32(255, 255, 255, 255);
+            yield return new WaitForSeconds(.3f);
+        }
+        msgFlashing = false;
     }
 }

@@ -81,6 +81,7 @@ public class microController : MonoBehaviour
             Debug.Log("NO SPACE");
         }
     }
+
     /*
     IEnumerator breakCheck()
     {
@@ -93,5 +94,16 @@ public class microController : MonoBehaviour
         }
     }*/
 
-
+    public void removeCargo(int space, int value)
+    {
+        foreach (GameObject cargoItem in cargo)
+        {
+            if (cargoItem.GetComponent<payLoadController>().space == space && cargoItem.GetComponent<payLoadController>().value == value)
+            {
+                cargo.Remove(cargoItem);
+                Destroy(cargoItem);
+                break;
+            }
+        }
+    }
 }
