@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Message : MonoBehaviour
@@ -11,6 +12,9 @@ public class Message : MonoBehaviour
 
     public bool weaponsPickup;
     public bool weaponsPickupActive;
+
+    public bool weaponsDropoff;
+
     public int weaponsCargoSpace;
     public int weaponsValue;
 
@@ -60,6 +64,26 @@ public class Message : MonoBehaviour
             if (weaponsPickup)
             {
                 GameObject.Find("MicroCanvas").GetComponent<microController>().addCargo(weaponsCargoSpace, weaponsValue);
+
+                weaponsCustomerSystem.GetComponent<Star>().message = Instantiate(weaponsCustomerSystem.GetComponent<Star>().msgPrefab);
+
+                weaponsCustomerSystem.GetComponent<Star>().message.GetComponent<Message>().isChoice = false;
+                weaponsCustomerSystem.GetComponent<Star>().message.GetComponent<Message>().weaponsPickup = false;
+                weaponsCustomerSystem.GetComponent<Star>().message.GetComponent<Message>().weaponsDropoff = true;
+                weaponsCustomerSystem.GetComponent<Star>().message.GetComponent<Message>().weaponsPickupActive = false;
+
+                weaponsCustomerSystem.GetComponent<Star>().message.GetComponent<Message>().weaponsDealerSystem = weaponsDealerSystem;
+
+                weaponsCustomerSystem.GetComponent<Star>().message.GetComponent<Message>().weaponsCargoSpace = weaponsCargoSpace;
+                weaponsCustomerSystem.GetComponent<Star>().message.GetComponent<Message>().weaponsValue = weaponsValue;
+                weaponsCustomerSystem.GetComponent<Star>().message.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text = "Dropped off cargo from " + weaponsDealerSystem.name + ".";
+
+                weaponsCustomerSystem.GetComponent<Star>().message.SetActive(false);
+            }
+
+            if (weaponsDropoff)
+            {
+                GameObject.Find("MicroCanvas").GetComponent<microController>().removeCargo(weaponsCargoSpace, weaponsValue);
             }
             //destroy this message to not clog up space
             Destroy(gameObject);

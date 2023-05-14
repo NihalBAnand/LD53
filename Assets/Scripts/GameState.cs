@@ -45,12 +45,15 @@ public class GameState : MonoBehaviour
 
         if (currentLocation.GetComponent<Star>().message != null)
         {
-            currentLocation.GetComponent<Star>().message.SetActive(true);
-            currentLocation.GetComponent<Star>().message.transform.SetParent(messages.transform.Find("Viewport").Find("Content"));
+            if (!currentLocation.GetComponent<Star>().message.GetComponent<Message>().weaponsPickup || currentLocation.GetComponent<Star>().message.GetComponent<Message>().weaponsPickupActive)
+            {
+                currentLocation.GetComponent<Star>().message.SetActive(true);
+                currentLocation.GetComponent<Star>().message.transform.SetParent(messages.transform.Find("Viewport").Find("Content"));
 
-            showMessages.GetComponent<ShowMessages>().unreadMessages.Add(currentLocation.GetComponent<Star>().message);
-            currentLocation.GetComponent<Star>().message.GetComponent<Message>().isRead = false;
-            currentLocation.GetComponent<Star>().message = null;
+                showMessages.GetComponent<ShowMessages>().unreadMessages.Add(currentLocation.GetComponent<Star>().message);
+                currentLocation.GetComponent<Star>().message.GetComponent<Message>().isRead = false;
+                currentLocation.GetComponent<Star>().message = null;
+            }
         }
 
         if (macroEnabled)
@@ -126,6 +129,8 @@ public class GameState : MonoBehaviour
             if (!generatedJob)
             {
                 generatedJob = true;
+
+                //determine space and value of cargo
                 int cargoSpace = Random.Range(10, 50);
                 int value = Random.Range(500, 2000);
 
@@ -144,12 +149,15 @@ public class GameState : MonoBehaviour
                 messageStar.GetComponent<Star>().message.SetActive(false);
 
                 dealer.GetComponent<Star>().message = Instantiate(dealer.GetComponent<Star>().msgPrefab);
+
                 dealer.GetComponent<Star>().message.GetComponent<Message>().isChoice = false;
                 dealer.GetComponent<Star>().message.GetComponent<Message>().weaponsPickup = true;
                 dealer.GetComponent<Star>().message.GetComponent<Message>().weaponsPickupActive = false;
-                
+
+                dealer.GetComponent<Star>().message.GetComponent<Message>().weaponsCustomerSystem = messageStar;
+                dealer.GetComponent<Star>().message.GetComponent<Message>().weaponsDealerSystem = dealer;
+
                 dealer.GetComponent<Star>().message.GetComponent<Message>().weaponsCargoSpace = cargoSpace;
-                
                 dealer.GetComponent<Star>().message.GetComponent<Message>().weaponsValue = value;
                 dealer.GetComponent<Star>().message.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text = "Received cargo bound for " + messageStar.name + ".";
 
