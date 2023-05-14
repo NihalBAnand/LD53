@@ -45,11 +45,19 @@ public class microController : MonoBehaviour
     //Ship Efficiency
     public double morale = 1;//I assume it causes mutiny(death)
     public double stability;
+
+    //Components
+    public Dictionary<string, int> components;
   
 
 
     void Start()
     {
+        components = new Dictionary<string, int>();
+        components.Add("Engine Health", 100);
+        components.Add("Hull", 100);
+        components.Add("Comms", 100);
+        components.Add("Weapons", 100);
 
         spaceAvail = cargoArea;
         cargo = new List<GameObject>();
@@ -108,6 +116,19 @@ public class microController : MonoBehaviour
                 Destroy(cargoItem);
                 break;
             }
+        }
+    }
+    public string repair(string c, int cost)
+    {
+        if (components[c] < 100 && moneyValue>cost)
+        {
+            components[c] = 100;
+            moneyValue -= cost;
+            return "repaired" + c;
+        }
+        else
+        {
+            return "no money get rekt";
         }
     }
 }
