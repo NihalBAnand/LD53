@@ -230,7 +230,6 @@ public class Star : MonoBehaviour
         int travelTime = 2000;
         travelTime = (int) ((double)travelTime / GameObject.Find("MicroCanvas").GetComponent<microController>().speed);
         int maxTT = travelTime;
-        Debug.Log(travelTime);
         while (travelTime >= 0)
         {
             yield return new WaitForSeconds(0.001f);
