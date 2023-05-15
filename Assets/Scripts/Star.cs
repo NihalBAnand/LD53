@@ -16,6 +16,9 @@ public class Star : MonoBehaviour
     public string nationality;
     public GameObject border;
 
+    public bool hasShop;
+    public GameObject shop;
+
     public Color color;
     bool selected;
 
@@ -85,6 +88,20 @@ public class Star : MonoBehaviour
                 infoBox.gameObject.GetComponent<StarInfoBox>().travelButton.GetComponent<Button>().interactable = false;
                 infoBox.gameObject.GetComponent<StarInfoBox>().travelButton.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().color = new Color32(0, 0, 0, 0);
             }
+
+            //if we are at a star that has a shop, enable the button to open it
+            if (GameObject.Find("GameState").GetComponent<GameState>().currentLocation == gameObject && hasShop)
+            {
+                infoBox.gameObject.GetComponent<StarInfoBox>().shopButton.GetComponent<Button>().interactable = true;
+                infoBox.gameObject.GetComponent<StarInfoBox>().shopButton.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().color = new Color32(0, 0, 0, 255);
+            }
+            //otherwise, disable it
+            else
+            {
+                infoBox.gameObject.GetComponent<StarInfoBox>().shopButton.GetComponent<Button>().interactable = false;
+                infoBox.gameObject.GetComponent<StarInfoBox>().shopButton.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().color = new Color32(0, 0, 0, 0);
+            }
+
         }
         else
         {
@@ -104,6 +121,9 @@ public class Star : MonoBehaviour
         initedHyperlaneConns = false;
 
         realConnectedStars = new HashSet<GameObject>();
+
+        if (hasShop)
+            shop.SetActive(false);
 
         //create hyperlane
         foreach (GameObject star in connectedStars)
@@ -213,57 +233,60 @@ public class Star : MonoBehaviour
 
     IEnumerator Travel()
     {
-        string comingFrom = GameObject.Find("GameState").GetComponent<GameState>().currentLocation.name;
-        string goingTo = name;
-
-        GameObject hyplane = GameObject.Find("HL_" + comingFrom + "-" + goingTo);
-        if (hyplane == null)
+        if (GameObject.Find("MicroCanvas").GetComponent<microController>().speed > 0)
         {
-            hyplane = GameObject.Find("HL_" + goingTo + "-" + comingFrom);
-        }
+            string comingFrom = GameObject.Find("GameState").GetComponent<GameState>().currentLocation.name;
+            string goingTo = name;
 
-        hyplane.GetComponent<Hyperlane>().selected = true;
+            GameObject hyplane = GameObject.Find("HL_" + comingFrom + "-" + goingTo);
+            if (hyplane == null)
+            {
+                hyplane = GameObject.Find("HL_" + goingTo + "-" + comingFrom);
+            }
 
-        GameObject.Find("GameState").GetComponent<GameState>().currentLocation = null;
-        GameObject.Find("GameState").GetComponent<GameState>().flying = true;
-
-        int travelTime = 2000;
-        travelTime = (int) ((double)travelTime / GameObject.Find("MicroCanvas").GetComponent<microController>().speed);
-        int maxTT = travelTime;
-        while (travelTime >= 0)
-        {
-            yield return new WaitForSeconds(0.001f);
-            travelTime--;
             hyplane.GetComponent<Hyperlane>().selected = true;
-            color = Color.Lerp(new Color32(66, 135, 245, 255), new Color32(255, 255, 255, 255), travelTime / (float)maxTT);
-        }
 
-        switch (hyplane.GetComponent<Hyperlane>().specialCondition)
-        {
-            case "Asteroid Field":
-                Debug.Log("Ship damaged by asteroid field");
-                break;
-            default:
-                break;
-        }
+            GameObject.Find("GameState").GetComponent<GameState>().currentLocation = null;
+            GameObject.Find("GameState").GetComponent<GameState>().flying = true;
 
-        //set player location to here
-        GameObject.Find("GameState").GetComponent<GameState>().currentLocation = gameObject;
+            int travelTime = 2000;
+            travelTime = (int)((double)travelTime / GameObject.Find("MicroCanvas").GetComponent<microController>().speed);
+            int maxTT = travelTime;
+            while (travelTime >= 0)
+            {
+                yield return new WaitForSeconds(0.001f);
+                travelTime--;
+                hyplane.GetComponent<Hyperlane>().selected = true;
+                color = Color.Lerp(new Color32(66, 135, 245, 255), new Color32(255, 255, 255, 255), travelTime / (float)maxTT);
+            }
 
-        //deselect everything
-        foreach (GameObject star in GameObject.FindGameObjectsWithTag("Star"))
-        {
-            star.GetComponent<Star>().selected = false;
-            star.transform.Find("InfoBox").gameObject.SetActive(false);
-        }
-        foreach (GameObject hplane in GameObject.FindGameObjectsWithTag("Hyperlane"))
-        {
-            hplane.GetComponent<Hyperlane>().selected = false;
-            hplane.transform.Find("InfoBox").gameObject.SetActive(false);
-        }
+            switch (hyplane.GetComponent<Hyperlane>().specialCondition)
+            {
+                case "Asteroid Field":
+                    Debug.Log("Ship damaged by asteroid field");
+                    break;
+                default:
+                    break;
+            }
 
-        GameObject.Find("GameState").GetComponent<GameState>().flying = false;
-        hyplane.GetComponent<Hyperlane>().selected = false;
+            //set player location to here
+            GameObject.Find("GameState").GetComponent<GameState>().currentLocation = gameObject;
+
+            //deselect everything
+            foreach (GameObject star in GameObject.FindGameObjectsWithTag("Star"))
+            {
+                star.GetComponent<Star>().selected = false;
+                star.transform.Find("InfoBox").gameObject.SetActive(false);
+            }
+            foreach (GameObject hplane in GameObject.FindGameObjectsWithTag("Hyperlane"))
+            {
+                hplane.GetComponent<Hyperlane>().selected = false;
+                hplane.transform.Find("InfoBox").gameObject.SetActive(false);
+            }
+
+            GameObject.Find("GameState").GetComponent<GameState>().flying = false;
+            hyplane.GetComponent<Hyperlane>().selected = false;
+        }
     }
 
     IEnumerator FlashMessage()
@@ -278,5 +301,10 @@ public class Star : MonoBehaviour
             yield return new WaitForSeconds(.3f);
         }
         msgFlashing = false;
+    }
+
+    public void OpenShop()
+    {
+        shop.SetActive(true);
     }
 }

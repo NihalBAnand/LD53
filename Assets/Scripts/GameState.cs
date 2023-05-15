@@ -75,6 +75,11 @@ public class GameState : MonoBehaviour
                 box.GetComponent<Canvas>().enabled = false;
             }
         }
+
+        if (currentLocation != null && !currentLocation.GetComponent<Star>().hasShop && GameObject.Find("Shop") != null)
+        {
+            GameObject.Find("Shop").SetActive(false);
+        }
     }
 
     public void ToggleMicroMacro()

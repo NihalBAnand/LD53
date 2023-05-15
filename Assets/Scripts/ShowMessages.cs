@@ -17,10 +17,11 @@ public class ShowMessages : MonoBehaviour
     {
         foreach (GameObject msg in unreadMessages)
         {
-            if (msg.GetComponent<Message>().isRead)
+            if (msg != null && msg.GetComponent<Message>().isRead || msg == null)
             {
                 unreadMessages.Remove(msg);
             }
+
         }
         if (unreadMessages.Count > 0)
         {

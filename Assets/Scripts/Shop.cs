@@ -2,10 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StarInfoBox : MonoBehaviour
+public class Shop : MonoBehaviour
 {
-    public GameObject travelButton;
-    public GameObject shopButton;
     // Start is called before the first frame update
     void Start()
     {
@@ -16,5 +14,10 @@ public class StarInfoBox : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void CloseShop()
+    {
+        gameObject.SetActive(false);
     }
 }
