@@ -213,10 +213,21 @@ public class Star : MonoBehaviour
 
     IEnumerator Travel()
     {
+        string comingFrom = GameObject.Find("GameState").GetComponent<GameState>().currentLocation.name;
+        string goingTo = name;
+
+        GameObject hyplane = GameObject.Find("HL_" + comingFrom + "-" + goingTo);
+        if (hyplane == null)
+        {
+            hyplane = GameObject.Find("HL_" + goingTo + "-" + comingFrom);
+        }
+
+        hyplane.GetComponent<Hyperlane>().selected = true;
+
         GameObject.Find("GameState").GetComponent<GameState>().currentLocation = null;
         GameObject.Find("GameState").GetComponent<GameState>().flying = true;
 
-        int travelTime = 5000;
+        int travelTime = 2000;
         travelTime = (int) ((double)travelTime / GameObject.Find("MicroCanvas").GetComponent<microController>().speed);
         int maxTT = travelTime;
         Debug.Log(travelTime);
@@ -224,8 +235,19 @@ public class Star : MonoBehaviour
         {
             yield return new WaitForSeconds(0.001f);
             travelTime--;
+            hyplane.GetComponent<Hyperlane>().selected = true;
             color = Color.Lerp(new Color32(66, 135, 245, 255), new Color32(255, 255, 255, 255), travelTime / (float)maxTT);
         }
+
+        switch (hyplane.GetComponent<Hyperlane>().specialCondition)
+        {
+            case "Asteroid Field":
+                Debug.Log("Ship damaged by asteroid field");
+                break;
+            default:
+                break;
+        }
+
         //set player location to here
         GameObject.Find("GameState").GetComponent<GameState>().currentLocation = gameObject;
 
@@ -242,6 +264,7 @@ public class Star : MonoBehaviour
         }
 
         GameObject.Find("GameState").GetComponent<GameState>().flying = false;
+        hyplane.GetComponent<Hyperlane>().selected = false;
     }
 
     IEnumerator FlashMessage()

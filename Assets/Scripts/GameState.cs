@@ -97,7 +97,7 @@ public class GameState : MonoBehaviour
 
                 //it's info and an asteroid field
                 newMessage.GetComponent<Message>().isChoice = false;
-                newMessage.GetComponent<Message>().hyperlaneInfo = "Asteroid field";
+                newMessage.GetComponent<Message>().hyperlaneInfo = "Asteroid Field";
 
                 //select our stars
                 GameObject affectedStar = GameObject.FindGameObjectsWithTag("Star")[Random.Range(0, GameObject.FindGameObjectsWithTag("Star").Length)];
@@ -112,11 +112,11 @@ public class GameState : MonoBehaviour
                     hyperlane = GameObject.Find("HL_" + targetStar + "-" + affectedStar.name);
                 }
                 //prevent duplicate messages
-                if (hyperlane.GetComponent<Hyperlane>().specialCondition != "None")
+                if (hyperlane.GetComponent<Hyperlane>().specialCondition == "None")
                 {
                     newMessage.GetComponent<Message>().relevantHyperlane = hyperlane;
                     newMessage.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text = "Asteroid field from " + affectedStar.name + " to " + targetStar + "!";
-                    newMessage.GetComponent<Message>().relevantHyperlane.GetComponent<Hyperlane>().specialCondition = newMessage.GetComponent<Message>().hyperlaneInfo;
+                    hyperlane.GetComponent<Hyperlane>().specialCondition = newMessage.GetComponent<Message>().hyperlaneInfo;
                     newMessage.transform.SetParent(messages.transform.Find("Viewport").Find("Content"));
 
                     showMessages.GetComponent<ShowMessages>().unreadMessages.Add(newMessage);
@@ -229,9 +229,12 @@ public class GameState : MonoBehaviour
             yield return new WaitForSeconds(1);
             acceptTime -= 1;
         }
-        job.GetComponent<Message>().weaponsCustomerSystem.GetComponent<Star>().message = null;
-        job.GetComponent<Message>().weaponsDealerSystem.GetComponent<Star>().message = null;
-        showMessages.GetComponent<ShowMessages>().unreadMessages.Remove(job);
-        Destroy(job);
+        if (job != null)
+        {
+            job.GetComponent<Message>().weaponsCustomerSystem.GetComponent<Star>().message = null;
+            job.GetComponent<Message>().weaponsDealerSystem.GetComponent<Star>().message = null;
+            showMessages.GetComponent<ShowMessages>().unreadMessages.Remove(job);
+            Destroy(job);
+        }
     }
 }
