@@ -24,7 +24,7 @@ public class microController : MonoBehaviour
 
     //MISC FOR NOW
     public bool hull = true;//You die if hull is gone
-    public double commHealth = 1;//less likely to recieve messages
+    public int commHealth = 100;//less likely to recieve messages
      
 
     //Cargo
@@ -52,7 +52,7 @@ public class microController : MonoBehaviour
     //Components
     public Dictionary<string, int> components;
   
-
+    
 
     void Start()
     {
@@ -72,6 +72,8 @@ public class microController : MonoBehaviour
     void Update()
     {
         speed = speedSlider.GetComponent<Slider>().value;
+
+        components["Comms"] = commHealth;
     }
 
 

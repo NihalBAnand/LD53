@@ -33,7 +33,10 @@ public class GameState : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.LeftAlt))
+        {
+            GenerateMessage();
+        }
         
 
         if (!initedMessages)
@@ -92,36 +95,48 @@ public class GameState : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(Random.Range(minTimeBetweenUpdates, maxTimeBetweenUpdates));
-            //TODO: Implement failure to receive but effect still happens
-            GameObject newMessage = Instantiate(message);
-            int roll = Random.Range(0, 100);
-            //Asteroid field - causes ship to be damaged if it goes through
-            if (roll < 50)
+
+            GenerateMessage();
+        }
+    }
+
+    void GenerateMessage()
+    {
+        //TODO: Implement failure to receive but effect still happens
+        GameObject newMessage = Instantiate(message);
+        int roll = Random.Range(0, 100);
+        //receive message is random
+        bool received = Mathf.RoundToInt(Random.Range(0, 100)) <= GameObject.Find("MicroCanvas").GetComponent<microController>().components["Comms"];
+        //Asteroid field - causes ship to be damaged if it goes through
+        if (roll < 50)
+        {
+            //TODO: Implement chance to clear asteroid field
+
+            //it's info and an asteroid field
+            newMessage.GetComponent<Message>().isChoice = false;
+            newMessage.GetComponent<Message>().hyperlaneInfo = "Asteroid Field";
+
+            //select our stars
+            GameObject affectedStar = GameObject.FindGameObjectsWithTag("Star")[Random.Range(0, GameObject.FindGameObjectsWithTag("Star").Length)];
+            int selectedStar = Random.Range(0, affectedStar.GetComponent<Star>().realConnectedStars.Count);
+            string targetStar = affectedStar.GetComponent<Star>().realConnectedStars.ElementAt(selectedStar).name;
+
+            //find relevant hyperlane
+            GameObject hyperlane = GameObject.Find("HL_" + affectedStar.name + "-" + targetStar);
+            //swap name if it was generated the other way
+            if (hyperlane == null)
             {
-                //TODO: Implement chance to clear asteroid field
+                hyperlane = GameObject.Find("HL_" + targetStar + "-" + affectedStar.name);
+            }
+            //prevent duplicate messages
+            if (hyperlane.GetComponent<Hyperlane>().specialCondition == "None")
+            {
+                hyperlane.GetComponent<Hyperlane>().specialCondition = newMessage.GetComponent<Message>().hyperlaneInfo;
 
-                //it's info and an asteroid field
-                newMessage.GetComponent<Message>().isChoice = false;
-                newMessage.GetComponent<Message>().hyperlaneInfo = "Asteroid Field";
-
-                //select our stars
-                GameObject affectedStar = GameObject.FindGameObjectsWithTag("Star")[Random.Range(0, GameObject.FindGameObjectsWithTag("Star").Length)];
-                int selectedStar = Random.Range(0, affectedStar.GetComponent<Star>().realConnectedStars.Count);
-                string targetStar = affectedStar.GetComponent<Star>().realConnectedStars.ElementAt(selectedStar).name;
-
-                //find relevant hyperlane
-                GameObject hyperlane = GameObject.Find("HL_" + affectedStar.name + "-" + targetStar);
-                //swap name if it was generated the other way
-                if (hyperlane == null)
-                {
-                    hyperlane = GameObject.Find("HL_" + targetStar + "-" + affectedStar.name);
-                }
-                //prevent duplicate messages
-                if (hyperlane.GetComponent<Hyperlane>().specialCondition == "None")
+                if (received)
                 {
                     newMessage.GetComponent<Message>().relevantHyperlane = hyperlane;
                     newMessage.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text = "Asteroid field from " + affectedStar.name + " to " + targetStar + "!";
-                    hyperlane.GetComponent<Hyperlane>().specialCondition = newMessage.GetComponent<Message>().hyperlaneInfo;
                     newMessage.transform.SetParent(messages.transform.Find("Viewport").Find("Content"));
 
                     showMessages.GetComponent<ShowMessages>().unreadMessages.Add(newMessage);
@@ -129,8 +144,12 @@ public class GameState : MonoBehaviour
                 }
                 else
                 {
-                    Destroy(newMessage);
+                    Debug.Log("Dropped a message!");
                 }
+            }
+            else
+            {
+                Destroy(newMessage);
             }
         }
     }
