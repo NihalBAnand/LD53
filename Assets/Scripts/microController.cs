@@ -111,14 +111,16 @@ public class microController : MonoBehaviour
     {
         foreach (GameObject cargoItem in cargo)
         {
-            if (complete)
-            {
-                moneyValue += cargoItem.GetComponent<payLoadController>().roi();
-            }
             if (cargoItem.GetComponent<payLoadController>().space == space && cargoItem.GetComponent<payLoadController>().initvalue == value)
             {
                 cargo.Remove(cargoItem);
                 Destroy(cargoItem);
+
+                if (complete)
+                {
+                    moneyValue += cargoItem.GetComponent<payLoadController>().roi();
+                }
+
                 break;
             }
         }

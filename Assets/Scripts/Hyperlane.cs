@@ -79,5 +79,11 @@ public class Hyperlane : MonoBehaviour
         {
             color = new Color32(204, 135, 8, 255);
         }
+
+        if (specialConditionKnown)
+        {
+            transform.Find("Alert").gameObject.SetActive(true);
+            transform.Find("Alert").localEulerAngles = -transform.localEulerAngles;
+        }
     }
 }

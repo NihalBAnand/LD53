@@ -246,8 +246,15 @@ public class Star : MonoBehaviour
 
             hyplane.GetComponent<Hyperlane>().selected = true;
 
+            GameObject player = Instantiate(GameObject.Find("GameState").GetComponent<GameState>().playerSprite);
+            player.transform.SetParent(GameObject.Find("ScaledUI").transform);
+            player.transform.position = GameObject.Find("GameState").GetComponent<GameState>().currentLocation.transform.position;
+            player.transform.localScale = new Vector3(.25f, .25f, 1);
+
             GameObject.Find("GameState").GetComponent<GameState>().currentLocation = null;
             GameObject.Find("GameState").GetComponent<GameState>().flying = true;
+
+            Vector3 ogPos = player.transform.position;
 
             int travelTime = 2000;
             travelTime = (int)((double)travelTime / GameObject.Find("MicroCanvas").GetComponent<microController>().speed);
@@ -258,6 +265,7 @@ public class Star : MonoBehaviour
                 travelTime--;
                 hyplane.GetComponent<Hyperlane>().selected = true;
                 color = Color.Lerp(new Color32(66, 135, 245, 255), new Color32(255, 255, 255, 255), travelTime / (float)maxTT);
+                player.transform.position = Vector3.Lerp(transform.position, ogPos, travelTime / (float)maxTT);
             }
 
             switch (hyplane.GetComponent<Hyperlane>().specialCondition)
@@ -286,6 +294,8 @@ public class Star : MonoBehaviour
 
             GameObject.Find("GameState").GetComponent<GameState>().flying = false;
             hyplane.GetComponent<Hyperlane>().selected = false;
+
+            Destroy(player);
         }
     }
 

@@ -12,6 +12,7 @@ public class GameState : MonoBehaviour
     public GameObject messages;
     public GameObject message;
     public GameObject showMessages;
+  
     public float minTimeBetweenUpdates;
     public float maxTimeBetweenUpdates;
     public float minTimeBetweenJobs;
@@ -22,6 +23,8 @@ public class GameState : MonoBehaviour
     bool initedMessages;
     
     public bool flying;
+
+    public GameObject playerSprite;
     // Start is called before the first frame update
     void Start()
     {
